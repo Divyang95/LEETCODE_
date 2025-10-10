@@ -1,3 +1,6 @@
+import axios from "axios";
+import 'dotenv/config';
+
 export const getJudge0LanguageId = (language)=>{
     const languageMap = {
         "PYTHON":71,
@@ -5,15 +8,33 @@ export const getJudge0LanguageId = (language)=>{
         "JAVASCRIPT":63
     }
 
-    return languageMap[language.toUppercase()] 
+    return languageMap[language.toUpperCase()] ?? null;
 }
 
 export const submitBatch =  async(submissions)=>{
-    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`, {submissions})
+    try {
+        console.log("Sending to Judge0:", JSON.stringify({ submissions }, null, 2));
+        const options = {
+            method: 'POST',
+            url: 'https://judge0-ce.p.sulu.sh/submissions/batch',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: process.env.JUDGE0_API_URL_SULU
+            },
+            data: {submissions}
+        }
+        const {data} = await axios.post(options.url, options.data, { headers: options.headers })
 
-    console.log("Submissions results :", data)
+        console.log("Submissions results :", data)
 
-    return data 
+        return data 
+        
+    } catch (error) {
+        console.log("Error submitting to Judge0:", error.response?.data || error.message);
+        throw error;
+    }
+    
 
 }
 
@@ -21,12 +42,14 @@ const sleep = (ms)=>new Promise((resolve)=> setTimeout(resolve, ms))
 
 export const pollBatchResults = async(tokens)=>{
     while(true){
-        const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`, {
-            params:{
-                tokens:tokens.join(","), //convertes array into string
-                base64_encoded:false 
+        const url= 'https://judge0-ce.p.sulu.sh/submissions/batch'
+        const headers= {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: process.env.JUDGE0_API_URL_SULU
             }
-        })
+        
+        const {data} = await axios.get(url, { headers, params: { tokens: tokens.join(',') } })
 
         const results = data.submissions;
 
