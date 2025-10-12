@@ -144,7 +144,7 @@ model Playlist{
   @@unique([name,userId]) //unique playlist name per user 
 }
 
-mdoel ProblemInPlaylist{
+model ProblemInPlaylist{
   id String @id @default(uuid())
   playListId String 
   problemId String 
