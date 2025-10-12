@@ -115,7 +115,7 @@ export const executeCode = async (req,res)=>{
 
        console.log("Test Case Results: ",testCaseResults)
 
-       await db.testCaseResult.createMany({
+        await db.testCaseResult.createMany({
         data:testCaseResults
        })
 
