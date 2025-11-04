@@ -24,7 +24,6 @@ const LoginPage = () => {
   const onSubmit = async(data)=>{
     try {
       await login(data)
-
     } catch (error) {
       console.error("Signup Failed:", error)
     } 

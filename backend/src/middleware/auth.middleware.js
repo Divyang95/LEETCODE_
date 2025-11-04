@@ -6,7 +6,7 @@ export const authMiddleWare = async (req,res,next)=>{
         
         const token = req.cookies.jwt;
         if(!token){
-            res.status(401).json({
+            return res.status(401).json({
                 message:"Unauthorised - No Token Provided"
             })
         }

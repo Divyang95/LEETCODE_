@@ -102,9 +102,9 @@ export const addProblemToPlaylist = async (req,res)=>{
         }
 
         //create records for each problems in the playlist 
-        const problemsInPlaylist = await db.problemsInPlaylist.createMany({
+        const problemInPlaylist = await db.problemInPlaylist.createMany({
             data:problemIds.map((problemId)=>({
-                playlistId,
+                playListId:playlistId,
                 problemId 
             }))
         })
@@ -112,7 +112,7 @@ export const addProblemToPlaylist = async (req,res)=>{
         res.status(201).json({
             success:true, 
             message:"Problems added successfully to the playlist",
-            problemsInPlaylist 
+            problemInPlaylist 
         })
 
 
@@ -151,9 +151,9 @@ export const removeProblemFromPlaylist = async (req,res)=>{
             return res.status(400).json({error:"Invalid or missing problemIds"})
         }
 
-        const deletedProblem = await db.problemsInPlaylist.deleteMany({
+        const deletedProblem = await db.problemInPlaylist.deleteMany({
             where:{
-                playlistId,
+                playListId:playlistId,
                 problemId:{
                     in:problemIds 
                 }

@@ -4,6 +4,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {z} from "zod"
 import Editor from "@monaco-editor/react"
 
+
 import {Plus, Trash2, Code2, FileText, Lightbulb, BookOpen, CheckCircle2, Download} from "lucide-react"
 import {useState} from "react"; 
 import { axiosInstance } from '../lib/axios.js'
@@ -18,7 +19,7 @@ const problemSchema = z.object({
     constraints: z.string().min(1, "Constraints are required"), 
     hints: z.string().optional(), 
     editorial: z.string().optional(), 
-    testCases: z.array(
+    testcases: z.array(
         z.object({
             input: z.string().min(1, "Input is required"), 
             output: z.string().min(1, "Output is required")
@@ -508,7 +509,7 @@ const CreateProblemForm = () => {
         {
             resolver:zodResolver(problemSchema), 
             defaultValues:{
-                testCases:[{input:"", output:""}], 
+                testcases:[{input:"", output:""}], 
                 tags:[""], 
                 examples:{
                     JAVASCRIPT:{input:"", output:"", explanation:""},
@@ -535,10 +536,23 @@ const CreateProblemForm = () => {
     const {fields:tagFields, append:appendTag, remove:removeTag, replace:replaceTags} = 
     useFieldArray({control, name:"tags",}); 
 
-    const [isLoading, setLoading] = useState(false); 
+    const [isLoading, setIsLoading] = useState(false); 
     
     const onSubmit = async (value)=>{
-            console.log(value)
+            try {
+                setIsLoading(true)
+                const res = await axiosInstance.post("/problems/create-problem", value);
+                console.log(res.data); 
+                toast.success(res.data.message || "Problem Created Successfully"); 
+                navigation("/"); 
+
+            } catch (error) {
+                console.log(error)
+                toast.error("Error in Creating Problem")
+            }
+            finally{
+                setIsLoading(false)
+            }
         }
 
     const loadSampleData = ()=>{
@@ -564,7 +578,7 @@ const CreateProblemForm = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-4 border-b">
             <h2 className="card-title text-2xl md:text-3xl flex items-center gap-3">
               <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-              Create Problem
+              Create Problem  
             </h2>
 
             <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
@@ -725,7 +739,7 @@ const CreateProblemForm = () => {
                 >
                   <Plus className="w-4 h-4 mr-1" /> Add Test Case
                 </button>
-              </div>
+              </div> 
               <div className="space-y-6">
                 {testCaseFields.map((field, index) => (
                   <div key={field.id} className="card bg-base-100 shadow-md">
